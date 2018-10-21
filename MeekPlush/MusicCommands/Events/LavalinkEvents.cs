@@ -12,6 +12,7 @@ namespace MeekPlush.Events.MusicCommands
         public static Task TrackEnd(TrackFinishEventArgs lg)
         {
             Console.WriteLine(lg.Reason);
+            Console.WriteLine(lg.Track.IsStream);
             if (lg.Reason == TrackEndReason.Finished && lg.Player.CurrentState.CurrentTrack.IsStream)
             {
                 Bot.Guilds[lg.Player.Guild.Id].GuildConnection.Play(Bot.Guilds[lg.Player.Guild.Id].CurrentSong.Track);

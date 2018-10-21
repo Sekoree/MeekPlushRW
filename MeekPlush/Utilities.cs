@@ -26,17 +26,17 @@ namespace MeekPlush
                 var emb = new DiscordEmbedBuilder();
                 emb.WithColor(new DiscordColor("6785A9"));
                 emb.WithTitle("Select A Track!");
-                string tracks = "**Respond with the number of the Track you want to select! (or type 'cancel' to cancel this)**\n\n";
+                string tracks = "**Respond with the number of the Track you want to select! (or type 'cancel' to cancel this)**";
                 string[] nums = new[] { "1", "2", "3", "4", "5" };
                 int am = 5;
                 if (Tracks.Tracks.Count() < 5) am = Tracks.Tracks.Count();
                 for (int i = 1; i <= am; i++)
                 {
-                    var cur = Tracks.Tracks.ElementAt(i);
+                    var cur = Tracks.Tracks.ElementAt(i - 1);
                     string time = "";
                     if (cur.Length.Hours < 1) time = cur.Length.ToString(@"mm\:ss");
                     else time = cur.Length.ToString(@"hh\:mm\:ss");
-                    tracks += $"**{nums[i - 1]}. {cur.Title} [{time}]**\n   by {cur.Author}\n";
+                    emb.AddField($"{nums[i - 1]}. {cur.Title} [{time}]",$"by {cur.Author}");
                 }
                 emb.WithDescription(tracks);
                 var res1 = await ctx.RespondAsync(embed: emb.Build());
@@ -53,6 +53,7 @@ namespace MeekPlush
                     await selTrack.Message.DeleteAsync();
                     await res1.DeleteAsync();
                     return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(0) };
+                    //return new List<LavalinkTrack> { new LavalinkTrack { TrackString = Tracks.Tracks.ElementAt(0).TrackString } };
                 }
                 else if (selTrack.Message.Content.StartsWith("2"))
                 {

@@ -22,8 +22,9 @@ namespace MeekPlush.MusicCommands
             var emb = new DiscordEmbedBuilder();
             emb.WithTitle("MeekPlush Help");
             string prefix = "m!";
-            if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != "m!") prefix = Bot.Members[ctx.Member.Id].Prefix;
-            else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == "m!") prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
+            if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
+            else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == null) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
+            else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
             emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"__**Playlist Commands**__\n\n" +
                 $"**{prefix}ml create <PlaylistName>** || Creates a Playlist with that name\n" +
@@ -44,8 +45,8 @@ namespace MeekPlush.MusicCommands
             emb.AddField("Info", $"Avatar by Chillow#1945 :heart: [Twitter](https://twitter.com/SaikoSamurai)\n" +
                 $"Bot Github: soon™\n" +
                 $"DBL: [Link](https://discordbots.org/bot/465675368775417856) every upvote helps and is appreciated uwu\n" +
-                $"Support Server: [Invite](https://discord.gg/YPPA2Pu)" +
-                $"[Paypal](https://www.paypal.me/speyd3r) [Patreon](https://www.patreon.com/speyd3r)");
+                $"Support Server: [Invite](https://discord.gg/YPPA2Pu)\n" +
+                $"Support me uwu on [Paypal](https://www.paypal.me/speyd3r) or [Patreon](https://www.patreon.com/speyd3r)");
             emb.WithColor(new DiscordColor("6785A9"));
             await ctx.RespondAsync(embed: emb.Build());
         }

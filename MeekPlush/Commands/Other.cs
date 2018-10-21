@@ -40,9 +40,9 @@ namespace MeekPlush.Commands
             var emb = new DiscordEmbedBuilder();
             emb.WithTitle("MeekPlush Help");
             string prefix = "m!";
-            if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != "m!") prefix = Bot.Members[ctx.Member.Id].Prefix;
-            else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == "m!") prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
-            else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != "m!") prefix = Bot.Members[ctx.Member.Id].Prefix;
+            if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
+            else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == null) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
+            else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
             emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"**All Commands and additional Help Commands!**\n\n" +
                 $"**{prefix}info** || Info about the Bot and you!" +
@@ -54,7 +54,7 @@ namespace MeekPlush.Commands
                 $"**{prefix}images** || Display all Image commands\n" +
                 $"**{prefix}mylist** || Display all Playlist commands\n" +
                 $"**{prefix}youtube** || Display YouTube commands\n" +
-                $"**{prefix}australian <Words?> || Translate something to Australian");
+                $"**{prefix}australian <Words?>** || Translate something to Australian");
             emb.AddField("GuildInfo", $"Your prefix is: {Bot.Members[ctx.Member.Id].Prefix}\n" +
                 $"This Guilds Prefix is: {Bot.Guilds[ctx.Guild.Id].Prefix}");
             emb.AddField("Info",$"Avatar by Chillow#1945 :heart: [Twitter](https://twitter.com/SaikoSamurai)\n" +
