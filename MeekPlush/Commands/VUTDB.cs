@@ -1,20 +1,15 @@
-﻿using System;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity.Extensions;
+
+using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
 using System.IO;
 using System.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Dynamic;
+using System.Threading.Tasks;
 
 namespace MeekPlush.Commands
 {
@@ -81,18 +76,18 @@ namespace MeekPlush.Commands
                 var ten = DiscordEmoji.FromName(ctx.Client, ":keycap_ten:");
                 try
                 {
-                    var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == one || xe == two || xe == three || xe == four || xe == five || xe == six || xe == seven || xe == eight || xe == nine || xe == ten), init, ctx.Message.Author, TimeSpan.FromSeconds(60));
+                    var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == one || xe.Emoji == two || xe.Emoji == three || xe.Emoji == four || xe.Emoji == five || xe.Emoji == six || xe.Emoji == seven || xe.Emoji == eight || xe.Emoji == nine || xe.Emoji == ten) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(60));
 
-                    if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) select = 0;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) select = 1;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) select = 2;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) select = 3;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) select = 4;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) select = 5;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) select = 6;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) select = 7;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) select = 8;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) select = 9;
+                    if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) select = 0;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) select = 1;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) select = 2;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) select = 3;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) select = 4;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) select = 5;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) select = 6;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) select = 7;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) select = 8;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) select = 9;
                 }
                 catch
                 {
@@ -137,13 +132,13 @@ namespace MeekPlush.Commands
                 //var emoji6 = DiscordEmoji.FromName(ctx.Client, ":arrow_double_down:");
                 try
                 {
-                    var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == emoji || xe == emoji2 || xe == emoji3 || xe == emoji4 || xe == emoji5), init, ctx.Message.Author, TimeSpan.FromSeconds(123));
+                    var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == emoji || xe.Emoji == emoji2 || xe.Emoji == emoji3 || xe.Emoji == emoji4 || xe.Emoji == emoji5) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(123));
 
-                    if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":pushpin:")) BaseiInfo(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":page_facing_up:")) LyricEm(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":movie_camera:")) PVShowInfo(ctx, init, select, myresponse, ddresponse, oof2);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:")) Derratives(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":x:"))
+                    if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":pushpin:")) BaseiInfo(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":page_facing_up:")) LyricEm(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":movie_camera:")) PVShowInfo(ctx, init, select, myresponse, ddresponse, oof2);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:")) Derratives(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":x:"))
                     {
                         loop = false;
                         await init.DeleteAllReactionsAsync();
@@ -222,17 +217,17 @@ namespace MeekPlush.Commands
                 var ten = DiscordEmoji.FromName(ctx.Client, ":keycap_ten:");
                 try
                 {
-                    var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == one || xe == two || xe == three || xe == four || xe == five || xe == six || xe == seven || xe == eight || xe == nine || xe == ten), init, ctx.Message.Author, TimeSpan.FromSeconds(60));
-                    if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) select = 0;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) select = 1;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) select = 2;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) select = 3;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) select = 4;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) select = 5;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) select = 6;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) select = 7;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) select = 8;
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) select = 9;
+                    var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == one || xe.Emoji == two || xe.Emoji == three || xe.Emoji == four || xe.Emoji == five || xe.Emoji == six || xe.Emoji == seven || xe.Emoji == eight || xe.Emoji == nine || xe.Emoji == ten) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(60));
+                    if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) select = 0;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) select = 1;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) select = 2;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) select = 3;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) select = 4;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) select = 5;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) select = 6;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) select = 7;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) select = 8;
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) select = 9;
                 }
                 catch
                 {
@@ -276,13 +271,13 @@ namespace MeekPlush.Commands
                 //var emoji6 = DiscordEmoji.FromName(ctx.Client, ":arrow_double_down:");
                 try
                 {
-                    var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == emoji || xe == emoji2 || xe == emoji3 || xe == emoji4 || xe == emoji5), init, ctx.Message.Author, TimeSpan.FromSeconds(123));
+                    var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == emoji || xe.Emoji == emoji2 || xe.Emoji == emoji3 || xe.Emoji == emoji4 || xe.Emoji == emoji5) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(123));
 
-                    if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":pushpin:")) BaseiInfo(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":page_facing_up:")) LyricEm(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":movie_camera:")) PVShowInfo(ctx, init, select, myresponse, ddresponse, oof2);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:")) Derratives(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":x:"))
+                    if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":pushpin:")) BaseiInfo(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":page_facing_up:")) LyricEm(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":movie_camera:")) PVShowInfo(ctx, init, select, myresponse, ddresponse, oof2);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:")) Derratives(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":x:"))
                     {
                         loop = false;
                         await init.DeleteAllReactionsAsync();
@@ -358,18 +353,18 @@ namespace MeekPlush.Commands
                 var nine = DiscordEmoji.FromName(ctx.Client, ":nine:");
                 var ten = DiscordEmoji.FromName(ctx.Client, ":keycap_ten:");
                 try { 
-                var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == one || xe == two || xe == three || xe == four || xe == five || xe == six || xe == seven || xe == eight || xe == nine || xe == ten), init, ctx.Message.Author, TimeSpan.FromSeconds(60));
+                var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == one || xe.Emoji == two || xe.Emoji == three || xe.Emoji == four || xe.Emoji == five || xe.Emoji == six || xe.Emoji == seven || xe.Emoji == eight || xe.Emoji == nine || xe.Emoji == ten) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(60));
 
-                if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) select = 0;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) select = 1;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) select = 2;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) select = 3;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) select = 4;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) select = 5;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) select = 6;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) select = 7;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) select = 8;
-                else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) select = 9;
+                if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) select = 0;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) select = 1;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) select = 2;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) select = 3;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) select = 4;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) select = 5;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) select = 6;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) select = 7;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) select = 8;
+                else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) select = 9;
                 }
                 catch
                 {
@@ -410,13 +405,13 @@ namespace MeekPlush.Commands
                 var emoji5 = DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:");
                 try
                 {
-                    var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == emoji || xe == emoji2 || xe == emoji3 || xe == emoji4 || xe == emoji5), init, ctx.Message.Author, TimeSpan.FromSeconds(123));
+                    var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == emoji || xe.Emoji == emoji2 || xe.Emoji == emoji3 || xe.Emoji == emoji4 || xe.Emoji == emoji5) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(123));
 
-                    if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":pushpin:")) BaseiInfo(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":page_facing_up:")) LyricEm(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":movie_camera:")) PVShowInfo(ctx, init, select, myresponse, ddresponse, oof2);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:")) Derratives(ctx, init, select, myresponse, ddresponse);
-                    else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":x:"))
+                    if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":pushpin:")) BaseiInfo(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":page_facing_up:")) LyricEm(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":movie_camera:")) PVShowInfo(ctx, init, select, myresponse, ddresponse, oof2);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":revolving_hearts:")) Derratives(ctx, init, select, myresponse, ddresponse);
+                    else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":x:"))
                     {
                         loop = false;
                         await init.DeleteAllReactionsAsync();
@@ -446,10 +441,9 @@ namespace MeekPlush.Commands
                 {
                     Color = new DiscordColor("#68D3D2"),
                     Title = "Results!",
-                    Description = "Entry for " + myresponse.term,
-                    ThumbnailUrl = tumurl
+                    Description = "Entry for " + myresponse.term
                 };
-
+                emim.WithThumbnail(tumurl);
                 emim.AddField("Artist", myresponse.items[select].artistString, true);
                 emim.AddField("Title", myresponse.items[select].defaultName, true);
                 emim.AddField("Language", myresponse.items[select].defaultNameLanguage, true);
@@ -501,10 +495,9 @@ namespace MeekPlush.Commands
                 var emim = new DiscordEmbedBuilder
                 {
                     Color = new DiscordColor("#68D3D2"),
-                    Title = "Results!",
-                    ThumbnailUrl = tumurl
+                    Title = "Results!"
                 };
-
+                emim.WithThumbnail(tumurl);
                 emim.AddField("Artist", myresponse.items[select].artistString, true);
                 emim.AddField("Title", myresponse.items[select].defaultName, true);
                 emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -541,17 +534,17 @@ namespace MeekPlush.Commands
                     var ten = DiscordEmoji.FromName(ctx.Client, ":keycap_ten:");
                     try
                     {
-                        var reSelect = await interactivity.WaitForMessageReactionAsync(xe => (xe == one || xe == two || xe == three || xe == four || xe == five || xe == six || xe == seven || xe == eight || xe == nine || xe == ten), init, ctx.Message.Author, TimeSpan.FromSeconds(30));
-                        if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) lyse = 0;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) lyse = 1;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) lyse = 2;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) lyse = 3;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) lyse = 4;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) lyse = 5;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) lyse = 6;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) lyse = 7;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) lyse = 8;
-                        else if (reSelect.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) lyse = 9;
+                        var reSelect = await interactivity.WaitForReactionAsync(xe => (xe.Emoji == one || xe.Emoji == two || xe.Emoji == three || xe.Emoji == four || xe.Emoji == five || xe.Emoji == six || xe.Emoji == seven || xe.Emoji == eight || xe.Emoji == nine || xe.Emoji == ten) && xe.Message == init, ctx.Message.Author, TimeSpan.FromSeconds(30));
+                        if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":one:")) lyse = 0;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":two:")) lyse = 1;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":three:")) lyse = 2;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":four:")) lyse = 3;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":five:")) lyse = 4;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":six:")) lyse = 5;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":seven:")) lyse = 6;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":eight:")) lyse = 7;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":nine:")) lyse = 8;
+                        else if (reSelect.Result.Emoji == DiscordEmoji.FromName(ctx.Client, ":keycap_ten:")) lyse = 9;
                     }
                     catch
                     {
@@ -611,9 +604,9 @@ namespace MeekPlush.Commands
                 var emim = new DiscordEmbedBuilder
                 {
                     Color = new DiscordColor("#68D3D2"),
-                    Title = "Covers & Remixes!",
-                    ThumbnailUrl = tumurl
+                    Title = "Covers & Remixes!"
                 };
+                emim.WithThumbnail(tumurl);
                 string stuff = "";
                 foreach (var derr in dresponse)
                 {

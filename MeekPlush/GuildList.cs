@@ -1,8 +1,8 @@
-﻿using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp.Entities;
+using DisCatSharp.Lavalink;
+
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MeekPlush
 {

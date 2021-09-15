@@ -1,10 +1,13 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using Newtonsoft.Json;
+
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+
 using static HeyRed.Mime.MimeTypesMap;
 
 namespace MeekPlush.Commands.RanImg
@@ -36,7 +39,10 @@ namespace MeekPlush.Commands.RanImg
             response.Close();
             emim.WithAuthor(name: "via nekos.life", url: "https://nekos.life/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{GetExtension(response2.ContentType)}", fileData: dataStream2, embed: emim.Build());
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{GetExtension(response2.ContentType)}", dataStream2);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("nl"), RequireNsfw, Description("get a random picture from nekos.life (category name required, look at point 11 of https://nekos.life/api/v2/endpoints) nneds NSFW Channel, due to this random pic database beim 2/3 porn lmao")]

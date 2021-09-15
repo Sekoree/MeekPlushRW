@@ -1,15 +1,17 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
-using MeekPlush.Events.MusicCommands;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MeekPlush.MusicCommands
@@ -25,7 +27,7 @@ namespace MeekPlush.MusicCommands
             if (Bot.Guilds[ctx.Guild.Id].GuildConnection?.IsConnected == false || Bot.Guilds[ctx.Guild.Id].GuildConnection == null)
             {
                 Bot.Guilds[ctx.Guild.Id].GuildConnection = await Bot.LLEU.ConnectAsync(chn);
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished += LavalinkEvents.TrackEnd;
+                Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished += Events.MusicCommands.LavalinkEvents.TrackEnd;
             }
             else
             {
@@ -44,7 +46,7 @@ namespace MeekPlush.MusicCommands
             Bot.Guilds[ctx.Guild.Id].UsedChannel = ctx.Channel.Id;
             if (Options?.ToLower().StartsWith("k") == true)
             {
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Disconnect();
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.DisconnectAsync();
                 Bot.Guilds[ctx.Guild.Id].Repeat = false;
                 Bot.Guilds[ctx.Guild.Id].RepeatAll = false;
                 Bot.Guilds[ctx.Guild.Id].Shuffle = false;
@@ -53,7 +55,7 @@ namespace MeekPlush.MusicCommands
             }
             else
             {
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Disconnect();
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.DisconnectAsync();
                 Bot.Guilds[ctx.Guild.Id].Repeat = false;
                 Bot.Guilds[ctx.Guild.Id].RepeatAll = false;
                 Bot.Guilds[ctx.Guild.Id].Shuffle = false;
@@ -61,7 +63,7 @@ namespace MeekPlush.MusicCommands
                 Bot.Guilds[ctx.Guild.Id].CurrentSong = new QueueBase();
             }
             Bot.Guilds[ctx.Guild.Id].Playing = false;
-            Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished -= LavalinkEvents.TrackEnd;
+            Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished -= Events.MusicCommands.LavalinkEvents.TrackEnd;
             Bot.Guilds[ctx.Guild.Id].GuildConnection = null;
             await ctx.RespondAsync("cya!");
         }
@@ -77,7 +79,7 @@ namespace MeekPlush.MusicCommands
                 if (Bot.Guilds[ctx.Guild.Id].GuildConnection == null)
                 {
                     Bot.Guilds[ctx.Guild.Id].GuildConnection = await Bot.LLEU.ConnectAsync(chn);
-                    Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished += LavalinkEvents.TrackEnd;
+                    Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished += Events.MusicCommands.LavalinkEvents.TrackEnd;
                 }
                 else
                 {
@@ -101,7 +103,7 @@ namespace MeekPlush.MusicCommands
                 && Bot.Guilds[ctx.Guild.Id].Paused)
             {
                 Bot.Guilds[ctx.Guild.Id].Paused = false;
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Resume();
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.ResumeAsync();
                 await ctx.RespondAsync("Playback was just paused, so it was unpaused!");
             }
             else if (Bot.Guilds[ctx.Guild.Id].CurrentSong.Requester == null
@@ -119,7 +121,7 @@ namespace MeekPlush.MusicCommands
                 }
                 if (Bot.Guilds[ctx.Guild.Id].Shuffle) nextSong = rnd.Next(0, Bot.Guilds[ctx.Guild.Id].Queue.Count);
                 Bot.Guilds[ctx.Guild.Id].CurrentSong = Bot.Guilds[ctx.Guild.Id].Queue[nextSong];
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Play(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
                 string time = "";
                 if (Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.Hours < 1) time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"mm\:ss");
                 else time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"hh\:mm\:ss");
@@ -149,7 +151,7 @@ namespace MeekPlush.MusicCommands
                 }
                 if (Bot.Guilds[ctx.Guild.Id].Shuffle) nextSong = rnd.Next(0, Bot.Guilds[ctx.Guild.Id].Queue.Count);
                 Bot.Guilds[ctx.Guild.Id].CurrentSong = Bot.Guilds[ctx.Guild.Id].Queue[nextSong];
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Play(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
                 string time = "";
                 if (Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.Hours < 1) time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"mm\:ss");
                 else time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"hh\:mm\:ss");
@@ -192,7 +194,7 @@ namespace MeekPlush.MusicCommands
                 }
                 if (Bot.Guilds[ctx.Guild.Id].Shuffle) nextSong = rnd.Next(0, Bot.Guilds[ctx.Guild.Id].Queue.Count);
                 Bot.Guilds[ctx.Guild.Id].CurrentSong = Bot.Guilds[ctx.Guild.Id].Queue[nextSong];
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Play(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
+                await Bot .Guilds[ctx.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
                 string time = "";
                 if (Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.Hours < 1) time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"mm\:ss");
                 else time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"hh\:mm\:ss");
@@ -228,7 +230,7 @@ namespace MeekPlush.MusicCommands
                 if (Bot.Guilds[ctx.Guild.Id].Paused)
                 {
                     Bot.Guilds[ctx.Guild.Id].Paused = false;
-                    Bot.Guilds[ctx.Guild.Id].GuildConnection.Resume();
+                    await Bot.Guilds[ctx.Guild.Id].GuildConnection.ResumeAsync();
                     await ctx.RespondAsync("Playback was just paused, so it was resumed!");
                 }
             }
@@ -261,7 +263,7 @@ namespace MeekPlush.MusicCommands
                 }
                 if (Bot.Guilds[ctx.Guild.Id].Shuffle) nextSong = rnd.Next(0, Bot.Guilds[ctx.Guild.Id].Queue.Count);
                 Bot.Guilds[ctx.Guild.Id].CurrentSong = Bot.Guilds[ctx.Guild.Id].Queue[nextSong];
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Play(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
             }
             else
             {
@@ -269,7 +271,7 @@ namespace MeekPlush.MusicCommands
                 {
                     Bot.Guilds[ctx.Guild.Id].Queue.Remove(Bot.Guilds[ctx.Guild.Id].Queue.First(x => x.RequestTime == Bot.Guilds[ctx.Guild.Id].CurrentSong.RequestTime));
                 }
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Stop();
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.StopAsync();
             }
             await ctx.RespondAsync("skipped...");
         }
@@ -283,7 +285,7 @@ namespace MeekPlush.MusicCommands
                 || Bot.Guilds[ctx.Guild.Id].GuildConnection == null) return;
             Bot.Guilds[ctx.Guild.Id].UsedChannel = ctx.Channel.Id;
             Bot.Guilds[ctx.Guild.Id].Stop = true;
-            Bot.Guilds[ctx.Guild.Id].GuildConnection.Stop();
+            await Bot.Guilds[ctx.Guild.Id].GuildConnection.StopAsync();
             await ctx.RespondAsync("stopped");
         }
 
@@ -296,7 +298,7 @@ namespace MeekPlush.MusicCommands
                 || Bot.Guilds[ctx.Guild.Id].GuildConnection == null) return;
             Bot.Guilds[ctx.Guild.Id].UsedChannel = ctx.Channel.Id;
             if (vol > 150) vol = 150;
-            Bot.Guilds[ctx.Guild.Id].GuildConnection.SetVolume(vol);
+            await Bot.Guilds[ctx.Guild.Id].GuildConnection.SetVolumeAsync(vol);
             await ctx.RespondAsync($"Volume changed to **{vol}** (150 is max)");
         }
 
@@ -310,13 +312,13 @@ namespace MeekPlush.MusicCommands
             Bot.Guilds[ctx.Guild.Id].UsedChannel = ctx.Channel.Id;
             if (Bot.Guilds[ctx.Guild.Id].Paused)
             {
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Resume();
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.ResumeAsync();
                 Bot.Guilds[ctx.Guild.Id].Paused = false;
                 await ctx.RespondAsync("Resumed...");
             }
             else
             {
-                Bot.Guilds[ctx.Guild.Id].GuildConnection.Pause();
+                await Bot.Guilds[ctx.Guild.Id].GuildConnection.PauseAsync();
                 Bot.Guilds[ctx.Guild.Id].Paused = true;
                 await ctx.RespondAsync("Paused.");
             }
@@ -330,7 +332,7 @@ namespace MeekPlush.MusicCommands
                 || chn == null
                 || Bot.Guilds[ctx.Guild.Id].GuildConnection == null) return;
             Bot.Guilds[ctx.Guild.Id].UsedChannel = ctx.Channel.Id;
-            Bot.Guilds[ctx.Guild.Id].GuildConnection.Resume();
+            await Bot .Guilds[ctx.Guild.Id].GuildConnection.ResumeAsync();
             Bot.Guilds[ctx.Guild.Id].Paused = false;
             await ctx.RespondAsync($"Resumed...");
         }
@@ -365,8 +367,8 @@ namespace MeekPlush.MusicCommands
                 || Bot.Guilds[ctx.Guild.Id].GuildConnection == null
                 || r > Bot.Guilds[ctx.Guild.Id].Queue.Count - 1) return;
             Bot.Guilds[ctx.Guild.Id].UsedChannel = ctx.Channel.Id;
-            int pos2 = ctx.Member.Roles.ToList().FindIndex(x => x.CheckPermission(DSharpPlus.Permissions.ManageMessages) == DSharpPlus.PermissionLevel.Allowed);
-            int pos3 = ctx.Member.Roles.ToList().FindIndex(x => x.CheckPermission(DSharpPlus.Permissions.Administrator) == DSharpPlus.PermissionLevel.Allowed);
+            int pos2 = ctx.Member.Roles.ToList().FindIndex(x => x.CheckPermission(Permissions.ManageMessages) == PermissionLevel.Allowed);
+            int pos3 = ctx.Member.Roles.ToList().FindIndex(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed);
             if (ctx.Member == Bot.Guilds[ctx.Guild.Id].Queue[r].Requester || pos2 != -1 || pos3 != -1)
             {
                 await ctx.RespondAsync($"Removed: **{Bot.Guilds[ctx.Guild.Id].Queue[r].Track.Title}** by **{Bot.Guilds[ctx.Guild.Id].Queue[r].Track.Author}**");
@@ -500,7 +502,7 @@ namespace MeekPlush.MusicCommands
             {
                 Pages.Remove(eP);
             }
-            await inter.SendPaginatedMessage(ctx.Channel, ctx.User, Pages, TimeSpan.FromMinutes(5), TimeoutBehaviour.DeleteReactions);
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, TimeSpan.FromMinutes(5));
         }
 
         [Command("nowplaying"), Aliases("np")]

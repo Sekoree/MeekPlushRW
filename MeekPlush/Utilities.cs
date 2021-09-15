@@ -1,11 +1,11 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MeekPlush
@@ -17,7 +17,7 @@ namespace MeekPlush
             var inter = ctx.Client.GetInteractivity();
             if (!song.StartsWith("https://") && !song.StartsWith("http://"))
             {
-                var Tracks = await Bot.LLEU.GetTracksAsync(song);
+                var Tracks = await Bot.LLEU.GetGuildConnection(ctx.Guild).GetTracksAsync(song);
                 if (Tracks.LoadResultType == LavalinkLoadResultType.LoadFailed
                     || Tracks.LoadResultType == LavalinkLoadResultType.NoMatches)
                 {
@@ -47,39 +47,39 @@ namespace MeekPlush
                 || x.Content.StartsWith("4")
                 || x.Content.StartsWith("5")
                 || x.Content.StartsWith("cancel")), TimeSpan.FromMinutes(1));
-                Console.WriteLine(selTrack.Message.Content);
-                if (selTrack.Message.Content.StartsWith("1"))
+                Console.WriteLine(selTrack.Result.Content);
+                if (selTrack.Result.Content.StartsWith("1"))
                 {
-                    await selTrack.Message.DeleteAsync();
+                    await selTrack.Result.DeleteAsync();
                     await res1.DeleteAsync();
                     return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(0) };
                     //return new List<LavalinkTrack> { new LavalinkTrack { TrackString = Tracks.Tracks.ElementAt(0).TrackString } };
                 }
-                else if (selTrack.Message.Content.StartsWith("2"))
+                else if (selTrack.Result.Content.StartsWith("2"))
                 {
-                    await selTrack.Message.DeleteAsync();
+                    await selTrack.Result.DeleteAsync();
                     await res1.DeleteAsync();
                     return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(1) };
                 }
-                else if (selTrack.Message.Content.StartsWith("3"))
+                else if (selTrack.Result.Content.StartsWith("3"))
                 {
-                    await selTrack.Message.DeleteAsync();
+                    await selTrack.Result.DeleteAsync();
                     await res1.DeleteAsync();
                     return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(2) };
                 }
-                else if (selTrack.Message.Content.StartsWith("4"))
+                else if (selTrack.Result.Content.StartsWith("4"))
                 {
-                    await selTrack.Message.DeleteAsync();
+                    await selTrack.Result.DeleteAsync();
                     await res1.DeleteAsync();
                     return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(3) };
                 }
-                else if (selTrack.Message.Content.StartsWith("5"))
+                else if (selTrack.Result.Content.StartsWith("5"))
                 {
-                    await selTrack.Message.DeleteAsync();
+                    await selTrack.Result.DeleteAsync();
                     await res1.DeleteAsync();
                     return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(4) };
                 }
-                else if (selTrack.Message.Content.StartsWith("cancel"))
+                else if (selTrack.Result.Content.StartsWith("cancel"))
                 {
                     await ctx.Message.DeleteAsync();
                     await res1.DeleteAsync();
@@ -89,7 +89,7 @@ namespace MeekPlush
             }
             else
             {
-                var Tracks = await Bot.LLEU.GetTracksAsync(new Uri(song));
+                var Tracks = await Bot.LLEU.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri(song));
                 if (Tracks.LoadResultType == LavalinkLoadResultType.LoadFailed
                     || Tracks.LoadResultType == LavalinkLoadResultType.NoMatches)
                 {
@@ -119,25 +119,25 @@ namespace MeekPlush
                     || x.Content.StartsWith("no")
                     || x.Content.StartsWith("2")
                     || x.Content.StartsWith("cancel")), TimeSpan.FromMinutes(1));
-                    if ((selTrack.Message.Content.StartsWith("yes") || selTrack.Message.Content.StartsWith("1")) && Tracks.PlaylistInfo.SelectedTrack != -1)
+                    if ((selTrack.Result.Content.StartsWith("yes") || selTrack.Result.Content.StartsWith("1")) && Tracks.PlaylistInfo.SelectedTrack != -1)
                     {
-                        await selTrack.Message.DeleteAsync();
+                        await selTrack.Result.DeleteAsync();
                         await res1.DeleteAsync();
                         return new List<LavalinkTrack> { Tracks.Tracks.ElementAt(Tracks.PlaylistInfo.SelectedTrack) };
                     }
-                    else if ((selTrack.Message.Content.StartsWith("yes") || selTrack.Message.Content.StartsWith("1")) && Tracks.PlaylistInfo.SelectedTrack == -1)
+                    else if ((selTrack.Result.Content.StartsWith("yes") || selTrack.Result.Content.StartsWith("1")) && Tracks.PlaylistInfo.SelectedTrack == -1)
                     {
-                        await selTrack.Message.DeleteAsync();
+                        await selTrack.Result.DeleteAsync();
                         await res1.DeleteAsync();
                         return new List<LavalinkTrack>(Tracks.Tracks);
                     }
-                    else if ((selTrack.Message.Content.StartsWith("no") || selTrack.Message.Content.StartsWith("2")) && Tracks.PlaylistInfo.SelectedTrack != -1)
+                    else if ((selTrack.Result.Content.StartsWith("no") || selTrack.Result.Content.StartsWith("2")) && Tracks.PlaylistInfo.SelectedTrack != -1)
                     {
-                        await selTrack.Message.DeleteAsync();
+                        await selTrack.Result.DeleteAsync();
                         await res1.DeleteAsync();
                         return new List<LavalinkTrack>(Tracks.Tracks);
                     }
-                    else if (selTrack.Message.Content.StartsWith("cancel"))
+                    else if (selTrack.Result.Content.StartsWith("cancel"))
                     {
                         await ctx.Message.DeleteAsync();
                         await res1.DeleteAsync();

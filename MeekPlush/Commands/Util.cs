@@ -1,11 +1,12 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Extensions;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MeekPlush.Commands
@@ -17,7 +18,7 @@ namespace MeekPlush.Commands
         public async Task GetRoleID(CommandContext ctx, string name)
         {
             var inter = ctx.Client.GetInteractivity();
-            var roles = ctx.Guild.Roles.Where(x => x.Name.Contains(name));
+            var roles = ctx.Guild.Roles.Values.Where(x => x.Name.Contains(name));
             var emb = new DiscordEmbedBuilder();
             int pi = 1;
             List<Page> rL = new List<Page>();
@@ -52,7 +53,7 @@ namespace MeekPlush.Commands
                     pi++;
                 }
             }
-            await inter.SendPaginatedMessage(ctx.Channel, ctx.User, rL);
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, rL);
         }
     }
 }

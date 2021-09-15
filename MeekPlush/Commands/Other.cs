@@ -1,12 +1,15 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Extensions;
+
 using MySql.Data.MySqlClient;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MeekPlush.Commands
@@ -21,7 +24,7 @@ namespace MeekPlush.Commands
             List<Page> emot = new List<Page>();
             int page = 1;
             var emb = new DiscordEmbedBuilder();
-            foreach (DiscordEmoji e in ems)
+            foreach (DiscordEmoji e in ems.Values)
             {
                 emb.WithTitle($"``{e.GetDiscordName()}``");
                 emb.WithImageUrl(e.Url);
@@ -31,7 +34,7 @@ namespace MeekPlush.Commands
                 });
                 page++;
             }
-            await inter.SendPaginatedMessage(ctx.Channel, ctx.User, emot);
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, emot);
         }
 
         [Command("help")]
@@ -43,7 +46,7 @@ namespace MeekPlush.Commands
             if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == null) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
-            emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+            emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"**All Commands and additional Help Commands!**\n\n" +
                 $"**{prefix}info** || Info about the Bot and you!" +
                 $"**{prefix}emotes** || Gives you a small 'catalog' of all custom emotes this server has!\n" +
@@ -116,7 +119,7 @@ namespace MeekPlush.Commands
             await ctx.RespondAsync("Your Personal prefix is now: " + newPrefix);
         }
 
-        [Command("guildprefix"), RequireUserPermissions(DSharpPlus.Permissions.Administrator)]
+        [Command("guildprefix"), RequireUserPermissions(Permissions.Administrator)]
         public async Task GuildPrefix(CommandContext ctx, [RemainingText] string newPrefix = "m!")
         {
             Bot.Guilds[ctx.Guild.Id].Prefix = newPrefix;

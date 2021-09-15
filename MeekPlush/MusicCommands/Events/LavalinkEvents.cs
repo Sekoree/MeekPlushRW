@@ -1,28 +1,28 @@
-﻿using DSharpPlus.Lavalink.EventArgs;
+﻿using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.EventArgs;
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MeekPlush.Events.MusicCommands
 {
     class LavalinkEvents
     {
-        public static Task TrackEnd(TrackFinishEventArgs lg)
+        public static async Task TrackEnd(LavalinkGuildConnection c, TrackFinishEventArgs lg)
         {
             Console.WriteLine(lg.Reason);
             Console.WriteLine(lg.Track.IsStream);
             if (lg.Reason == TrackEndReason.Finished && lg.Player.CurrentState.CurrentTrack.IsStream)
             {
-                Bot.Guilds[lg.Player.Guild.Id].GuildConnection.Play(Bot.Guilds[lg.Player.Guild.Id].CurrentSong.Track);
+                await Bot.Guilds[lg.Player.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[lg.Player.Guild.Id].CurrentSong.Track);
             }
             else if (lg.Reason == TrackEndReason.Finished && !Bot.Guilds[lg.Player.Guild.Id].Stop
                 || lg.Reason == TrackEndReason.LoadFailed && !Bot.Guilds[lg.Player.Guild.Id].Stop)
             {
                 if (lg.Reason == TrackEndReason.LoadFailed)
                 {
-                    lg.Player.Guild.GetChannel(Bot.Guilds[lg.Player.Guild.Id].UsedChannel).SendMessageAsync("Track failed to load, so it got skipped");
+                    await lg.Player.Guild.GetChannel(Bot.Guilds[lg.Player.Guild.Id].UsedChannel).SendMessageAsync("Track failed to load, so it got skipped");
                 }
                 if (!Bot.Guilds[lg.Player.Guild.Id].Repeat && !Bot.Guilds[lg.Player.Guild.Id].RepeatAll && Bot.Guilds[lg.Player.Guild.Id].GuildConnection != null)
                 {
@@ -43,7 +43,7 @@ namespace MeekPlush.Events.MusicCommands
                     }
                     if (Bot.Guilds[lg.Player.Guild.Id].Shuffle) nextSong = rnd.Next(0, Bot.Guilds[lg.Player.Guild.Id].Queue.Count);
                     Bot.Guilds[lg.Player.Guild.Id].CurrentSong = Bot.Guilds[lg.Player.Guild.Id].Queue[nextSong];
-                    Bot.Guilds[lg.Player.Guild.Id].GuildConnection.Play(Bot.Guilds[lg.Player.Guild.Id].Queue[nextSong].Track);
+                    await Bot.Guilds[lg.Player.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[lg.Player.Guild.Id].Queue[nextSong].Track);
                 }
                 else
                 {
@@ -64,7 +64,7 @@ namespace MeekPlush.Events.MusicCommands
                 Bot.Guilds[lg.Player.Guild.Id].Playing = false;
                 Bot.Guilds[lg.Player.Guild.Id].Stop = false;
             }
-            return Task.CompletedTask;
+            await Task.FromResult(true);
         }
     }
 }
