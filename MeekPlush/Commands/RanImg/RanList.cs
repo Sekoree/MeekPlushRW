@@ -1,9 +1,7 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using System.Threading.Tasks;
 
 namespace MeekPlush.Commands.RanImg
@@ -20,7 +18,7 @@ namespace MeekPlush.Commands.RanImg
             if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix.Length != 0) prefix = Bot.Members[ctx.Member.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix.Length == 0) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix.Length != 0) prefix = Bot.Members[ctx.Member.Id].Prefix;
-            emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+            emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"**Image Commands**");
             emb.AddField("__Animals__", $"**{prefix}cat** || Shows you a random Cat Picture\n" +
                 $"**{prefix}dog** || Shows you a random Dog Picture", true);

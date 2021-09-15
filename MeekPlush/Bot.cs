@@ -1,23 +1,26 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.Exceptions;
-using DSharpPlus.EventArgs;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
-using DSharpPlus.Lavalink.EventArgs;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+using DisCatSharp.EventArgs;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Net;
+
+using Microsoft.Extensions.Logging;
+
+using MySql.Data.MySqlClient;
+
+using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DSharpPlus.Net.Udp;
-using System.Linq;
-using MySql.Data.MySqlClient;
-using MeekPlush.Events.MusicCommands;
-using DiscordBotsList.Api;
-using System.IO;
-using Newtonsoft.Json;
+
 using static MeekPlush.Commands.XedddSpec;
 
 namespace MeekPlush
@@ -37,25 +40,20 @@ namespace MeekPlush
             bot = new DiscordShardedClient(new DiscordConfiguration
             {
                 TokenType = TokenType.Bot,
-                LogLevel = LogLevel.Debug,
-                UseInternalLogHandler = true
+                MinimumLogLevel = LogLevel.Debug
             });
-            bot.Heartbeated += async e =>
-            {
-                var me = await DblApi.GetMeAsync();
-                await me.UpdateStatsAsync(e.Client.Guilds.Count);
-            };
+
             bot.MessageCreated += Despacito;
             bot.MessageCreated += UWUReact;
             bot.MessageCreated += Bot_Dump;
             bot.GuildMemberRemoved += Bot_XedddBoiLeave;
-            bot.GuildDownloadCompleted += async e => {
+            bot.GuildDownloadCompleted += async (s, e) => {
                 setGame().Wait(1000);
-                InitNew(e).Wait(1000);
+                InitNew(s, e).Wait(1000);
                 Console.WriteLine("e");
                 await Task.CompletedTask;
             };
-            bot.VoiceStateUpdated += async e => {
+            bot.VoiceStateUpdated += async (s, e) => {
                 if (Guilds[e.Guild.Id].GuildConnection?.IsConnected  == false || Guilds[e.Guild.Id].GuildConnection == null) { return; }
                 if (e?.Before?.Channel?.Id == Guilds[e.Guild.Id].GuildConnection?.Channel?.Id
                 || e?.After?.Channel?.Id == Guilds[e.Guild.Id].GuildConnection?.Channel?.Id
@@ -64,8 +62,8 @@ namespace MeekPlush
                     if (Guilds[e.Guild.Id].GuildConnection?.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
                     {
                         Guilds[e.Guild.Id].Alone = true;
-                        AutoDisconnect(e.Guild.Id).Wait(1000);
-                        Guilds[e.Guild.Id].GuildConnection.Pause();
+                        await AutoDisconnect(e.Guild.Id);
+                        await Guilds[e.Guild.Id].GuildConnection.PauseAsync();
                         Guilds[e.Guild.Id].Paused = true;
                         await e.Guild.GetChannel(Guilds[e.Guild.Id].UsedChannel).SendMessageAsync($"Playback was paused since everybody left the Voice Channel, to unpause use ``{Guilds[e.Guild.Id].Prefix}resume`` otherwise I'll also disconnect in ~5min");
                     }
@@ -75,7 +73,7 @@ namespace MeekPlush
                     }
                 }
             };
-            bot.ClientErrored += e =>
+            bot.ClientErrored += (s, e) =>
             {
                 Console.WriteLine(e.Exception.Message);
                 Console.WriteLine(e.Exception.StackTrace);
@@ -152,7 +150,7 @@ namespace MeekPlush
             {
                 if (DCT.Subtract(DCT2).Minutes == 5)
                 {
-                    Guilds[GuildId].GuildConnection.Disconnect();
+                    await Guilds[GuildId].GuildConnection.DisconnectAsync();
                     Guilds[GuildId].Repeat = false;
                     Guilds[GuildId].RepeatAll = false;
                     Guilds[GuildId].Shuffle = false;
@@ -160,7 +158,7 @@ namespace MeekPlush
                     Guilds[GuildId].Paused = false;
                     Guilds[GuildId].Playing = false;
                     Guilds[GuildId].CurrentSong = new QueueBase();
-                    Guilds[GuildId].GuildConnection.PlaybackFinished -= LavalinkEvents.TrackEnd;
+                    Guilds[GuildId].GuildConnection.PlaybackFinished -= Events.MusicCommands.LavalinkEvents.TrackEnd;
                     Guilds[GuildId].GuildConnection = null;
                 }
                 else
@@ -171,7 +169,7 @@ namespace MeekPlush
             }
         }
 
-        public async Task Despacito(MessageCreateEventArgs e)
+        public async Task Despacito(DiscordClient c, MessageCreateEventArgs e)
         {
             if (e.Message.Content.ToLower().StartsWith("this is so sad alexa play despacito")
                 || e.Message.Content.ToLower().StartsWith("this is so sad, alexa play despacito")
@@ -180,14 +178,14 @@ namespace MeekPlush
                 try
                 {
                     var whc = await e.Channel.CreateWebhookAsync("Alexa");
-                    await whc.ExecuteAsync(content: "https://www.youtube.com/watch?v=kJQP7kiw5Fk", avatar_url: "https://images-eu.ssl-images-amazon.com/images/I/41iz5Tw82IL._SY300_QL70_.jpg");
+                    await whc.ExecuteAsync(new DiscordWebhookBuilder().WithContent("https://www.youtube.com/watch?v=kJQP7kiw5Fk").WithAvatarUrl("https://images-eu.ssl-images-amazon.com/images/I/41iz5Tw82IL._SY300_QL70_.jpg"));
                     await whc.DeleteAsync();
                 }
                 catch { }
             }
         }
 
-        public async Task UWUReact(MessageCreateEventArgs e)
+        public async Task UWUReact(DiscordClient c, MessageCreateEventArgs e)
         {
             if (e.Message.Content.ToLower().StartsWith("uwu"))
             {
@@ -195,7 +193,7 @@ namespace MeekPlush
                 await Task.Delay(TimeSpan.FromMilliseconds(500));
                 await e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🇼"));
                 await Task.Delay(TimeSpan.FromMilliseconds(500));
-                await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(e.Client, 455504120825249802));
+                await e.Message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(c, 455504120825249802));
             }
         }
 
@@ -219,7 +217,7 @@ namespace MeekPlush
             }
         }
 
-        public async Task InitNew(GuildDownloadCompletedEventArgs e)
+        public async Task InitNew(DiscordClient c, GuildDownloadCompletedEventArgs e)
         {
             await Task.Delay(1500);
             await Task.CompletedTask;
@@ -316,7 +314,7 @@ namespace MeekPlush
                     Console.WriteLine("INT DB Done");
                     await bot.UseInteractivityAsync(new InteractivityConfiguration
                     {
-                        PaginationBehavior = TimeoutBehaviour.DeleteReactions
+                        PaginationDeletion = PaginationDeletion.DeleteEmojis
                     });
                     var CNextClients = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
                     {
@@ -596,7 +594,7 @@ namespace MeekPlush
             }
         }
 
-        public async Task Bot_XedddBoiLeave(GuildMemberRemoveEventArgs e)
+        public async Task Bot_XedddBoiLeave(DiscordClient c, GuildMemberRemoveEventArgs e)
         {
             if (e.Guild.Id == 373635826703400960)
             {
@@ -606,7 +604,7 @@ namespace MeekPlush
             }
         }
 
-        public async Task Bot_Dump(MessageCreateEventArgs e)
+        public async Task Bot_Dump(DiscordClient c, MessageCreateEventArgs e)
         {
             try
             {

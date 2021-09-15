@@ -1,10 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
+
+using System;
+using System.Threading.Tasks;
 //using OpenQA.Selenium;
 //using OpenQA.Selenium.Firefox;
 
@@ -22,7 +24,7 @@ namespace MeekPlush.Commands
             if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == null) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
-            emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+            emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"**Youtube Search Commands!**\n\n" +
                 $"**{prefix}yt v <Searchterm>** || Searches a YouTube video\n" +
                 $"**{prefix}yt c <Searchterm>** || Searches a YouTube video\n" +

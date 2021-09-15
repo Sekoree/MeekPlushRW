@@ -1,15 +1,7 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using MeekPlush.Events.MusicCommands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using System.Threading.Tasks;
 
 namespace MeekPlush.MusicCommands
@@ -26,7 +18,7 @@ namespace MeekPlush.MusicCommands
             if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == null) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
-            emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+            emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"**__Ganeral Music Commands__**\n\n" +
                 $"**{prefix}join** || joins the Voice Channel you're in\n" +
                 $"**{prefix}leave (keep)** || leaves the Channel and optionally keeps the Queue\n" +

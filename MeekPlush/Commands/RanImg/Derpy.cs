@@ -1,13 +1,14 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using Newtonsoft.Json;
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
+
 using static HeyRed.Mime.MimeTypesMap;
 
 namespace MeekPlush.Commands.RanImg
@@ -44,7 +45,10 @@ namespace MeekPlush.Commands.RanImg
             response.Close();
             emim.WithAuthor(name: "via api.ohlookitsderpy.space", url: "https://api.ohlookitsderpy.space/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{GetExtension(response2.ContentType)}", fileData: dataStream2, embed: emim.Build());
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{GetExtension(response2.ContentType)}", dataStream2);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
     }
 }

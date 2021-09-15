@@ -1,14 +1,17 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+
 using MeekPlush.Events.MusicCommands;
+
 using MySql.Data.MySqlClient;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MeekPlush.MusicCommands
@@ -25,7 +28,7 @@ namespace MeekPlush.MusicCommands
             if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix != "m!" && Bot.Members[ctx.Member.Id].Prefix == null) prefix = Bot.Guilds[ctx.Guild.Id].Prefix;
             else if (Bot.Guilds[ctx.Guild.Id].Prefix == "m!" && Bot.Members[ctx.Member.Id].Prefix != null) prefix = Bot.Members[ctx.Member.Id].Prefix;
-            emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+            emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             emb.WithDescription($"__**Playlist Commands**__\n\n" +
                 $"**{prefix}ml create <PlaylistName>** || Creates a Playlist with that name\n" +
                 $"**{prefix}ml savequeue <PlaylistName>** || Creates a Playlist with that name and saves the current Queue to it\n" +
@@ -251,7 +254,7 @@ namespace MeekPlush.MusicCommands
                     Embed = emb.Build()
                 });
             }
-            await inter.SendPaginatedMessage(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5), TimeoutBehaviour.DeleteReactions);
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5));
         }
 
         [Command("add")]
@@ -276,21 +279,21 @@ namespace MeekPlush.MusicCommands
             && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content)
             || PList[Convert.ToInt32(x.Content) - 1].Key != null
             || x.Content.StartsWith("cancel")), TimeSpan.FromSeconds(30));
-            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
             {
-                selectedList = pl.Message.Content;
-                await pl.Message.DeleteAsync();
+                selectedList = pl.Result.Content;
+                await pl.Result.DeleteAsync();
                 await Plist.DeleteAsync();
             }
-            else if (PList[Convert.ToInt32(pl.Message.Content) - 1].Key != null)
+            else if (PList[Convert.ToInt32(pl.Result.Content) - 1].Key != null)
             {
-                selectedList = PList[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                await pl.Message.DeleteAsync();
+                selectedList = PList[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                await pl.Result.DeleteAsync();
                 await Plist.DeleteAsync();
             }
             else
             {
-                await pl.Message.DeleteAsync();
+                await pl.Result.DeleteAsync();
                 await Plist.DeleteAsync();
                 return;
             }
@@ -407,25 +410,25 @@ namespace MeekPlush.MusicCommands
                 });
             }
             string copiedPl = "";
-            inter.SendPaginatedMessage(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5), TimeoutBehaviour.DeleteMessage).Wait(0);
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5));
             var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
             && (PList.Any(y => y.Key == x.Content)
             || PList.ToList()[Convert.ToInt32(x.Content) - 1].Value != null), TimeSpan.FromSeconds(30));
-            if (PList.Any(x => x.Key == pl.Message.Content))
+            if (PList.Any(x => x.Key == pl.Result.Content))
             {
-                copiedPl = PList.First(x => x.Key == pl.Message.Content).Key;
-                selectedList = PList.First(x => x.Key == pl.Message.Content).Value;
-                await pl.Message.DeleteAsync();
+                copiedPl = PList.First(x => x.Key == pl.Result.Content).Key;
+                selectedList = PList.First(x => x.Key == pl.Result.Content).Value;
+                await pl.Result.DeleteAsync();
             }
-            else if (PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value != null)
+            else if (PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value != null)
             {
-                copiedPl = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                selectedList = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value;
-                await pl.Message.DeleteAsync();
+                copiedPl = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                selectedList = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value;
+                await pl.Result.DeleteAsync();
             }
             else
             {
-                await pl.Message.DeleteAsync();
+                await pl.Result.DeleteAsync();
                 return;
             }
             Bot.Members[ctx.Member.Id].Playlists.Add(name, new Playlists { });
@@ -510,38 +513,38 @@ namespace MeekPlush.MusicCommands
             var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
             && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content)
             || PList[Convert.ToInt32(x.Content) - 1].Key != null), TimeSpan.FromSeconds(30));
-            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
             {
-                selectedList = pl.Message.Content;
-                await pl.Message.DeleteAsync();
+                selectedList = pl.Result.Content;
+                await pl.Result.DeleteAsync();
                 await Plist.DeleteAsync();
             }
-            else if (PList[Convert.ToInt32(pl.Message.Content) - 1].Key != null)
+            else if (PList[Convert.ToInt32(pl.Result.Content) - 1].Key != null)
             {
-                selectedList = PList[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                await pl.Message.DeleteAsync();
+                selectedList = PList[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                await pl.Result.DeleteAsync();
                 await Plist.DeleteAsync();
             }
             else
             {
-                await pl.Message.DeleteAsync();
+                await pl.Result.DeleteAsync();
                 await Plist.DeleteAsync();
                 return;
             }
             int insPos = 1;
             var Pchoose = await ctx.RespondAsync("At wich position should the track(s) be inserted?");
             var pl2 = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
-                && ((Convert.ToInt32(pl.Message.Content) - 1) <= Bot.Members[ctx.Member.Id].Playlists[selectedList].Entries.Count 
-                || (Convert.ToInt32(pl.Message.Content) - 1) == -1), TimeSpan.FromSeconds(30));
-            if ((Convert.ToInt32(pl2.Message.Content) - 1) <= Bot.Members[ctx.Member.Id].Playlists[selectedList].Entries.Count || (Convert.ToInt32(pl2.Message.Content) - 1) == -1)
+                && ((Convert.ToInt32(pl.Result.Content) - 1) <= Bot.Members[ctx.Member.Id].Playlists[selectedList].Entries.Count 
+                || (Convert.ToInt32(pl.Result.Content) - 1) == -1), TimeSpan.FromSeconds(30));
+            if ((Convert.ToInt32(pl2.Result.Content) - 1) <= Bot.Members[ctx.Member.Id].Playlists[selectedList].Entries.Count || (Convert.ToInt32(pl2.Result.Content) - 1) == -1)
             {
-                insPos = Convert.ToInt32(pl.Message.Content) - 1;
-                await pl2.Message.DeleteAsync();
+                insPos = Convert.ToInt32(pl.Result.Content) - 1;
+                await pl2.Result.DeleteAsync();
                 await Pchoose.DeleteAsync();
             }
             else
             {
-                await pl2.Message.DeleteAsync();
+                await pl2.Result.DeleteAsync();
                 await Pchoose.DeleteAsync();
                 return;
             }
@@ -643,21 +646,21 @@ namespace MeekPlush.MusicCommands
             var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
                 && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content)
                 || PList[Convert.ToInt32(x.Content) - 1].Key != null), TimeSpan.FromSeconds(30));
-            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
             {
-                selectedList = pl.Message.Content;
-                await pl.Message.DeleteAsync();
+                selectedList = pl.Result.Content;
+                await pl.Result.DeleteAsync();
                 await PlistM.DeleteAsync();
             }
-            else if (PList[Convert.ToInt32(pl.Message.Content) - 1].Key != null)
+            else if (PList[Convert.ToInt32(pl.Result.Content) - 1].Key != null)
             {
-                selectedList = PList[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                await pl.Message.DeleteAsync();
+                selectedList = PList[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                await pl.Result.DeleteAsync();
                 await PlistM.DeleteAsync();
             }
             else
             {
-                await pl.Message.DeleteAsync();
+                await pl.Result.DeleteAsync();
                 await PlistM.DeleteAsync();
                 return;
             }
@@ -741,21 +744,21 @@ namespace MeekPlush.MusicCommands
                 var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
                 && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content)
                 || PList[Convert.ToInt32(x.Content) - 1].Key != null), TimeSpan.FromSeconds(30));
-                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
                 {
-                    name = pl.Message.Content;
-                    await pl.Message.DeleteAsync();
+                    name = pl.Result.Content;
+                    await pl.Result.DeleteAsync();
                     await PlistM.DeleteAsync();
                 }
-                else if (PList[Convert.ToInt32(pl.Message.Content) - 1].Key != null)
+                else if (PList[Convert.ToInt32(pl.Result.Content) - 1].Key != null)
                 {
-                    name = PList[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                    await pl.Message.DeleteAsync();
+                    name = PList[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                    await pl.Result.DeleteAsync();
                     await PlistM.DeleteAsync();
                 }
                 else
                 {
-                    await pl.Message.DeleteAsync();
+                    await pl.Result.DeleteAsync();
                     await PlistM.DeleteAsync();
                     return;
                 }
@@ -764,20 +767,20 @@ namespace MeekPlush.MusicCommands
             var Plist = await ctx.RespondAsync(Pls);
             var pl2 = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
             && x.Content.Length != 0, TimeSpan.FromSeconds(30));
-            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl2.Message.Content))
+            if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl2.Result.Content))
             {
                 await ctx.RespondAsync("You already havea Playlist with that name! canceled uwu");
                 return;
             }
-            if (pl2.Message.Content.Length != 0)
+            if (pl2.Result.Content.Length != 0)
             {
-                newName = pl2.Message.Content;
-                await pl2.Message.DeleteAsync();
+                newName = pl2.Result.Content;
+                await pl2.Result.DeleteAsync();
                 await Plist.DeleteAsync();
             }
             else
             {
-                await pl2.Message.DeleteAsync();
+                await pl2.Result.DeleteAsync();
                 await Plist.DeleteAsync();
                 return;
             }
@@ -848,21 +851,21 @@ namespace MeekPlush.MusicCommands
                 var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
                 && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content)
                 || PList[Convert.ToInt32(x.Content) - 1].Key != null), TimeSpan.FromSeconds(30));
-                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
                 {
-                    name = pl.Message.Content;
-                    await pl.Message.DeleteAsync();
+                    name = pl.Result.Content;
+                    await pl.Result.DeleteAsync();
                     await PlistM.DeleteAsync();
                 }
-                else if (PList[Convert.ToInt32(pl.Message.Content) - 1].Key != null)
+                else if (PList[Convert.ToInt32(pl.Result.Content) - 1].Key != null)
                 {
-                    name = PList[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                    await pl.Message.DeleteAsync();
+                    name = PList[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                    await pl.Result.DeleteAsync();
                     await PlistM.DeleteAsync();
                 }
                 else
                 {
-                    await pl.Message.DeleteAsync();
+                    await pl.Result.DeleteAsync();
                     await PlistM.DeleteAsync();
                     return;
                 }
@@ -970,25 +973,25 @@ namespace MeekPlush.MusicCommands
                         Embed = emb2.Build()
                     });
                 }
-                inter.SendPaginatedMessage(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5), TimeoutBehaviour.DeleteMessage).Wait(0);
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5));
                 var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
                 && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content
                 || PList.ToList()[Convert.ToInt32(x.Content) - 1].Value != null)), TimeSpan.FromSeconds(30));
-                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
                 {
-                    PlName = PList.ToList().First(x => x.Key == pl.Message.Content).Key;
-                    selectedList = PList.ToList().First(x => x.Key == pl.Message.Content).Value;
-                    await pl.Message.DeleteAsync();
+                    PlName = PList.ToList().First(x => x.Key == pl.Result.Content).Key;
+                    selectedList = PList.ToList().First(x => x.Key == pl.Result.Content).Value;
+                    await pl.Result.DeleteAsync();
                 }
-                else if (PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value != null)
+                else if (PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value != null)
                 {
-                    PlName = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                    selectedList = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value;
-                    await pl.Message.DeleteAsync();
+                    PlName = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                    selectedList = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value;
+                    await pl.Result.DeleteAsync();
                 }
                 else
                 {
-                    await pl.Message.DeleteAsync();
+                    await pl.Result.DeleteAsync();
                     return;
                 }
             }
@@ -1085,25 +1088,25 @@ namespace MeekPlush.MusicCommands
                         Embed = emb2.Build()
                     });
                 }
-                inter.SendPaginatedMessage(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5), TimeoutBehaviour.DeleteMessage).Wait(0);
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5));
                 var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
                 && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content
                 || PList.ToList()[Convert.ToInt32(x.Content) - 1].Value != null)), TimeSpan.FromSeconds(30));
-                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
                 {
-                    PlName = PList.ToList().First(x => x.Key == pl.Message.Content).Key;
-                    selectedList = PList.ToList().First(x => x.Key == pl.Message.Content).Value;
-                    await pl.Message.DeleteAsync();
+                    PlName = PList.ToList().First(x => x.Key == pl.Result.Content).Key;
+                    selectedList = PList.ToList().First(x => x.Key == pl.Result.Content).Value;
+                    await pl.Result.DeleteAsync();
                 }
-                else if (PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value != null)
+                else if (PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value != null)
                 {
-                    PlName = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                    selectedList = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value;
-                    await pl.Message.DeleteAsync();
+                    PlName = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                    selectedList = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value;
+                    await pl.Result.DeleteAsync();
                 }
                 else
                 {
-                    await pl.Message.DeleteAsync();
+                    await pl.Result.DeleteAsync();
                     return;
                 }
             }
@@ -1142,7 +1145,7 @@ namespace MeekPlush.MusicCommands
                             if (Bot.Guilds[ctx.Guild.Id].GuildConnection == null)
                             {
                                 Bot.Guilds[ctx.Guild.Id].GuildConnection = await Bot.LLEU.ConnectAsync(chn);
-                                Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished += LavalinkEvents.TrackEnd;
+                                Bot.Guilds[ctx.Guild.Id].GuildConnection.PlaybackFinished += Events.MusicCommands.LavalinkEvents.TrackEnd;
                             }
                             else
                             {
@@ -1159,7 +1162,7 @@ namespace MeekPlush.MusicCommands
                             if (Bot.Guilds[ctx.Guild.Id].RepeatAllPosition == Bot.Guilds[ctx.Guild.Id].Queue.Count) { Bot.Guilds[ctx.Guild.Id].RepeatAllPosition = 0; nextSong = 0; }
                         }
                         Bot.Guilds[ctx.Guild.Id].CurrentSong = Bot.Guilds[ctx.Guild.Id].Queue[nextSong];
-                        Bot.Guilds[ctx.Guild.Id].GuildConnection.Play(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
+                        await Bot.Guilds[ctx.Guild.Id].GuildConnection.PlayAsync(Bot.Guilds[ctx.Guild.Id].Queue[nextSong].Track);
                         string time = "";
                         if (Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.Hours < 1) time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"mm\:ss");
                         else time = Bot.Guilds[ctx.Guild.Id].CurrentSong.Track.Length.ToString(@"hh\:mm\:ss");
@@ -1239,25 +1242,25 @@ namespace MeekPlush.MusicCommands
                         Embed = emb2.Build()
                     });
                 }
-                inter.SendPaginatedMessage(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5), TimeoutBehaviour.DeleteMessage).Wait(0);
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, pages, TimeSpan.FromMinutes(2.5));
                 var pl = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.Member.Id
                 && (Bot.Members[ctx.Member.Id].Playlists.Any(y => y.Key == x.Content
                 || PList.ToList()[Convert.ToInt32(x.Content) - 1].Value != null)), TimeSpan.FromSeconds(30));
-                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Message.Content))
+                if (Bot.Members[ctx.Member.Id].Playlists.Any(x => x.Key == pl.Result.Content))
                 {
-                    PlName = PList.ToList().First(x => x.Key == pl.Message.Content).Key;
-                    selectedList = PList.ToList().First(x => x.Key == pl.Message.Content).Value;
-                    await pl.Message.DeleteAsync();
+                    PlName = PList.ToList().First(x => x.Key == pl.Result.Content).Key;
+                    selectedList = PList.ToList().First(x => x.Key == pl.Result.Content).Value;
+                    await pl.Result.DeleteAsync();
                 }
-                else if (PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value != null)
+                else if (PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value != null)
                 {
-                    PlName = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Key;
-                    selectedList = PList.ToList()[Convert.ToInt32(pl.Message.Content) - 1].Value;
-                    await pl.Message.DeleteAsync();
+                    PlName = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Key;
+                    selectedList = PList.ToList()[Convert.ToInt32(pl.Result.Content) - 1].Value;
+                    await pl.Result.DeleteAsync();
                 }
                 else
                 {
-                    await pl.Message.DeleteAsync();
+                    await pl.Result.DeleteAsync();
                     return;
                 }
             }
@@ -1319,7 +1322,7 @@ namespace MeekPlush.MusicCommands
             {
                 Pages.Remove(eP);
             }
-            await inter.SendPaginatedMessage(ctx.Channel, ctx.User, Pages, TimeSpan.FromMinutes(5), TimeoutBehaviour.DeleteReactions);
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, TimeSpan.FromMinutes(5));
         }
     }
 }
